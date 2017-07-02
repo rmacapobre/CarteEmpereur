@@ -1,5 +1,6 @@
 from enum import Enum
 import random
+import pygame
 
 
 class PlayState(Enum):
@@ -45,11 +46,29 @@ class Player:
             return ""
         return self.deck.v[index].name
 
+class Music:
+    def __init__(self):
+        pygame.init()
+    def playStart(self):
+        pygame.mixer.music.load('396166__zinklogicmedia__xylophone-groove-130-bpm.wav')
+        pygame.mixer.music.play()
+    def playLoseTurn(self):
+        pygame.mixer.music.load('396027__george-dragon__dramatic-horn.mp3')
+        pygame.mixer.music.play()
+    def playLoseGame(self):
+        pygame.mixer.music.load('396238__glazkov__smirnoff-scream.wav')
+        pygame.mixer.music.play()
+    def playWinGame(self):
+        pygame.mixer.music.load('369252__funwithsound__victory-celebration-movie-score.wav')
+        pygame.mixer.music.play()
+
+
 class Game:
 
     def __init__(self, p1, p2):
         self.player1 = Player(p1, "Empereur")
         self.player2 = Player(p2)
+        self.music = Music();
 
     def createDecks(self, playsEmperorDeck):
         if (playsEmperorDeck):
@@ -76,6 +95,8 @@ class Game:
                 return result
             except ValueError:
                 print("Please enter an amount in millimeters.")
+
+    # Which card player wants to play
     def whichCardPlayerWantsToPlay(self):
         ok = False
         while not ok:
@@ -159,6 +180,7 @@ class Game:
                 print(self.player1.name + " a gagne le round")
                 endRound = True;
             elif (state == PlayState.Lose):
+                self.music.playLoseTurn()
                 print(self.player1.name + " a perdu le round")
                 endRound = True;
 
@@ -184,6 +206,7 @@ class Game:
         round = 1
         thirdRound = 1
         playEmperorDeck = True
+        self.music.playStart()
         while (not endGame):
             self.playRound(round, playEmperorDeck)
             round += 1
@@ -193,16 +216,20 @@ class Game:
             else:
                 thirdRound += 1
             if (round == 13):
+                self.music.playWinGame()1
                 print("Maximum de 12 rounds")
                 endGame = True
             elif self.player1.distanceRemaining == 0:
+                self.music.playLoseGame()
                 print(self.player1.name + " a perdu le jeu")
                 endGame = True
             elif self.player1.winnings >= 20000000:
+                self.music.playWinGame()
                 print(self.player1.name + " a gagne 200M yen!")
                 endGame = True
             if (endGame == True):
                 playAgain = self.doYouWantToPlayAgain()
+                self.music.playStart()
                 if (playAgain == "Oui"):
                     round = 1
                     endGame = False
@@ -212,7 +239,7 @@ class Game:
         print("=======================================")
 
 
-x = Game("Edy", "Rico")
+x = Game("Allan", "Rico")
 x.start()
 
 
